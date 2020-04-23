@@ -45,9 +45,15 @@ class Event_type(models.Model):
     event_type_name = models.CharField(max_length = 255, null = False, default = '')
     event_type_description = models.CharField(max_length = 255, null = True, default = '')
 
+    def __str__(self):
+        return self.event_type_name
+
 class Workshop_type(models.Model):
     workshop_type_name = models.CharField(max_length = 255, null = False, default = '')
     workshop_type_description = models.CharField(max_length = 255, null = True, default = '')
+
+    def __str__(self):
+        return self.workshop_type_name
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
@@ -91,6 +97,9 @@ class Event(models.Model):
     four_stars = models.IntegerField(null = False, blank = False, default = 0)
     five_stars = models.IntegerField(null = False, blank = False, default = 0)
 
+    def __str__(self):
+        return self.event_name
+
 class Workshop(models.Model):
     workshop_name = models.CharField(max_length = 255, null = False, default = 'Sin nombre')
     workshop_address = models.CharField(max_length = 500, null = False, default = 'Sin indicar')
@@ -108,6 +117,9 @@ class Workshop(models.Model):
     workshop_type = models.ForeignKey(Workshop_type, on_delete = models.SET_NULL, null = True, default = None)
     workshop_commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True, default = None)
 
+    def __str__(self):
+        return self.workshop_name
+
 class Entertainment_areas(models.Model):
     area_name = models.CharField(max_length = 255, null = False, default = 'Sin nombre')
     area_address = models.CharField(max_length = 500, null = False, default = 'Sin indicar')
@@ -119,6 +131,9 @@ class Entertainment_areas(models.Model):
     area_available = models.IntegerField(null = False, default = 1, choices = available)
     area_commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True, default = None)
 
+    def __str__(self):
+        return self.area_name
+
 
 class Comments(models.Model):
     username = models.CharField(max_length = 255, null = False, blank = False, default = 'Sin nombre')
@@ -128,6 +143,9 @@ class Comments(models.Model):
     comment_time = models.TimeField(auto_now_add = False, auto_now = True, null = False, blank = False)
     likes = models.IntegerField(null = False, blank = False, default = 0)
 
+    def __str__(self):
+        return 'Comment by: ' + self.username + ' at ' + self.comment_date
+
 class Logs(models.Model):
     user = models.CharField(max_length = 10, null = False, blank = False, default = 'Sin identificar')
     table_name = models.CharField(max_length = 100, null = False, blank = False, default = 'Sin identificar')
@@ -135,3 +153,6 @@ class Logs(models.Model):
     description = models.CharField(max_length = 500, null = True, blank = True, default = 'Sin descripción')
     log_date = models.DateField(auto_now_add = False, auto_now = False, null = False, blank = False, default = timezone.now)
     log_time = models.TimeField(auto_now_add = False, auto_now = False, null = False, blank = False, default = timezone.now)
+
+    def __str__(self):
+        return self.user + ' did ' + self.action + ' into ' + self.table_name
