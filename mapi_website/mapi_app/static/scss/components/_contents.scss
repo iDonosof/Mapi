@@ -17,6 +17,7 @@ html,body{
 
 img{
     max-width: 100%;
+    max-height: 100%;
 }
 
 //****** CODIGO CONTENIDO PAGINA ******//
@@ -147,15 +148,18 @@ img{
 #google-map{
     border: solid;
     background: black;
-    // position: relative;
-    // left: 20%;
+    top: 10vh;
+    left: 0vh;
+    bottom: 0vh;
+    position: absolute;
 }
 
 
 @media only screen and (min-width:1024px){
     .center{
         width: 100%;
-        margin: 0 auto;
+        height: 100%;
+        margin: 0;
     }
 }
 
@@ -165,13 +169,8 @@ img{
     background: linear-gradient(-120deg,$color-footer,$color-footers);
     color: $scolor-background;
     height: $height-footer;
-    position: relative;
-    z-index: -1;
-
-    .footer-content{
-        border: 1px solid red;
-        height: 350px;
-    }
+    position: static;
+    z-index: 1;
 
     .footer-bottom{
         background: linear-gradient(-120deg,$color-footer,$color-footers);
@@ -185,44 +184,6 @@ img{
         padding-top: 20px;
     }
 }
-
-// .footer-items a{
-//     text-decoration: none;
-//     color: $scolor-background;
-//     align-items: center;
-    
-// }
-
-// .footer-items li{
-//     line-height: 7vw;
-// }
-
-// ul ,.footer-items{
-//     list-style-type: circle;
-//     align-items: center;
-//     text-align: center;
-// }
-
-.footer-items{
-
-    a{
-        text-decoration: none;
-        color: $scolor-background;
-        align-items: center;
-    }
-
-    li{
-        line-height: 5vh;
-    }
-}
-
-.footer-items,ul{
-    list-style-type: none;
-    align-items: center;
-    text-align: center;
-}
-
-
 
 //****** CODIGO DISEÑO EVENTOS CERCANOS ******//
 
