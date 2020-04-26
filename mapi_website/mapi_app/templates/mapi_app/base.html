@@ -3,9 +3,40 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="static/css/main.css">
+        <!-- Libreria para los cluster -->
+        <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
+        <!-- Importa la api key -->
+        <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATgmmy8p5H9y-vd5yLC3dzlDNEMrRJ7Tc">
+        </script>
+
         <title>Document</title>
+
     </head>
+
     <body>
+
         <h1>Mapi project start here!!!!</h1>
+        
+        <div id="mapMain"></div>
+        
+        <div>
+            <strong>Start: </strong>
+            <select id="start" onchange="calcRoute();">
+              <option value="Melipilla">Melipilla</option>
+              <option value="Talagante">Talagante</option>
+        </div>
+
+        
+
+        <script src="static/js/map.js"></script>
+        <script>
+            window.onload = () =>  {
+                initMap();
+                initGps();
+            }
+        </script>
+
     </body>
 </html>
