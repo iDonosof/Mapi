@@ -62,7 +62,7 @@ class Profile(models.Model):
     birthday = models.DateField(auto_now = False, auto_now_add = True, null = True)
     marital_situation = models.IntegerField(null = True, default = 4, choices = marital_situation)
     gender = models.IntegerField(null = True, default = 2, choices = gender)
-    commune = models.ForeignKey(Commune, on_delete = models.SET_DEFAULT, default = 'Desconocido', null = False)
+    commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True)
 
     def __str__(self):
         return self.user.username

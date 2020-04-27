@@ -10,5 +10,5 @@ urlpatterns = [
 
     #api rest
     path('api/api-test', api_requests.home),
-    path('api/event-list', api_requests.map_events_list),
+    path('api/event-list', api_requests.map_all_events_list),
 ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
