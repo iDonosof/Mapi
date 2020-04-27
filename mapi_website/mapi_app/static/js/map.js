@@ -58,16 +58,16 @@ function initMap() {
 
   // Centra el mapa en Maipu
   map = new google.maps.Map(
-    document.getElementById("mapMain"), {zoom: 10, center: {lat: -33.5116635, lng: -70.7702235},
+    document.getElementById("map"), {zoom: 12, center: {lat: -33.5116635, lng: -70.7702235},
     mapTypeId: google.maps.MapTypeId.ROADMA,
     disableDefaultUI: true});
   // Create the DIV to hold the control and call the CenterControl()
-        // constructor passing in this DIV.
-        var centerControlDiv = document.createElement('div');
-        var centerControl = new CenterControl(centerControlDiv, map);
+  // constructor passing in this DIV.
+  var centerControlDiv = document.createElement('div');
+  var centerControl = new CenterControl(centerControlDiv, map);
 
-        centerControlDiv.index = 1;
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+  centerControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
   directionsRenderer.setMap(map);
   addEvents();
 }
@@ -116,11 +116,11 @@ function initGps()
 
 function updatePosition(position)
   {
-  miubicacion = {
-    lat: position.coords.latitude,
-    lng: position.coords.longitude
+    miubicacion = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
     };
-  updateGps(miubicacion);
+    updateGps(miubicacion);
   }
 
 function showError(error){
