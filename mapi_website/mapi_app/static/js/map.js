@@ -169,7 +169,7 @@ function calcRoute(i) {
       destination: end,
       travelMode: "DRIVING"
     };
-    if(miubicacion !== ""){
+    if(miubicacion !== undefined){
       htmlGoogle = `https://www.google.com/maps/dir/?api=1&origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}`;
 
       document.querySelector("#controlText").style.visibility="visible";
