@@ -1,3 +1,7 @@
 {
+<<<<<<< HEAD
+    "python.pythonPath": "venv\\Scripts\\python.exe"
+=======
     "python.pythonPath": "C:\\Users\\Álvaro\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+>>>>>>> sp_map
 }
