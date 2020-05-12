@@ -305,4 +305,7 @@ img {
   font-size: 36px;
   margin-left: 50vh; }
 
+.closebtn:active {
+  background: linear-gradient(#ecf0f1, #bdc3c7); }
+
 /*# sourceMappingURL=main.css.map */
