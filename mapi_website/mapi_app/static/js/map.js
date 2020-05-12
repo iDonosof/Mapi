@@ -1,7 +1,8 @@
 var map;
 var directionsService, directionsRenderer;
-var miubicacion, interval;
+var miubicacion, interval, markerGlobal;
 var InforObj = [], htmlGoogle;
+
 
 var events = [
   {
@@ -59,9 +60,13 @@ function initMap() {
 
   // Centra el mapa en Maipu
   map = new google.maps.Map(
-    document.getElementById("map"), {zoom: 12, center: {lat: -33.5116635, lng: -70.7702235},
+    document.getElementById("map"), {zoom: 6.75, center: {lat: -33.2196658, lng: -70.6806571},
     mapTypeId: google.maps.MapTypeId.ROADMA,
-    disableDefaultUI: true});
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeControl: true,
+    streetViewControl: true,
+  });
   // Create the DIV to hold the control and call the CenterControl()
   // constructor passing in this DIV.
   var centerControlDiv = document.createElement('div');
@@ -90,6 +95,7 @@ function addEvents(){
     const markerEvents = new google.maps.Marker({
         id: events[i].id,
         position: events[i].LatLng[0],
+        animation: google.maps.Animation.DROP,
         map: map
     });
 
@@ -117,7 +123,7 @@ function closeOtherInfo() {
   if (InforObj.length > 0) {
       InforObj[0].set("marker", null);
       InforObj[0].close();
-      InforObj.length = 0;
+      InforObj.length = 0;   
   }
 }
 
@@ -189,7 +195,7 @@ function calcRoute(i) {
       destination: end,
       travelMode: "DRIVING"
     };
-    if(miubicacion !== ""){
+    if(miubicacion !== undefined){
       htmlGoogle = `https://www.google.com/maps/dir/?api=1&origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}`;
 
       document.querySelector("#controlText").style.visibility="visible";
