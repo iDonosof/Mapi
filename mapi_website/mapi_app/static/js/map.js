@@ -1,7 +1,8 @@
 var map;
 var directionsService, directionsRenderer;
-var miubicacion, interval;
+var miubicacion, interval, markerGlobal;
 var InforObj = [], htmlGoogle;
+
 
 var events = [
   {
@@ -58,9 +59,13 @@ function initMap() {
 
   // Centra el mapa en Maipu
   map = new google.maps.Map(
-    document.getElementById("map"), {zoom: 12, center: {lat: -33.5116635, lng: -70.7702235},
+    document.getElementById("map"), {zoom: 6.75, center: {lat: -33.2196658, lng: -70.6806571},
     mapTypeId: google.maps.MapTypeId.ROADMA,
-    disableDefaultUI: true});
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeControl: true,
+    streetViewControl: true,
+  });
   // Create the DIV to hold the control and call the CenterControl()
   // constructor passing in this DIV.
   var centerControlDiv = document.createElement('div');
@@ -75,8 +80,9 @@ function initMap() {
 function addEvents(){
   for (var i = 0; i < events.length; i++) {
     var contentString = '<div id="content"><h1>'+ events[i].eventName +'</h1><p>'+ events[i].eventDescrip +'</p></div><button onClick="calcRoute('+ i +');">Ver Camino</button>';
-    const markerEvents = new google.maps.Marker({
+        const markerEvents = new google.maps.Marker({
         position: events[i].LatLng[0],
+        animation: google.maps.Animation.DROP,
         map: map
     });
 
@@ -86,9 +92,13 @@ function addEvents(){
     });
 
     markerEvents.addListener('click', function () {
-        closeOtherInfo();
-        infowindow.open(markerEvents.get('map'), markerEvents);
-        InforObj[0] = infowindow;
+      let markerEventOld;
+      closeOtherInfo();
+      infowindow.open(markerEvents.get('map'), markerEvents);
+      markerEvents.setAnimation(google.maps.Animation.BOUNCE);
+      markerEventOld = markerEvents;
+      markerEventOld.setAnimation(null);
+      InforObj[0] = infowindow;
     });
   }
 }
@@ -97,7 +107,7 @@ function closeOtherInfo() {
   if (InforObj.length > 0) {
       InforObj[0].set("marker", null);
       InforObj[0].close();
-      InforObj.length = 0;
+      InforObj.length = 0;   
   }
 }
 
