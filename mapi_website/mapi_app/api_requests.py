@@ -54,7 +54,6 @@ def map_all_events_list(request):
     "workshop_coordinates_longitude", "workshop_coordinates_latitude", "workshop_type")
     try:
         for workshop in workshops.values():
-            breakpoint()
             event_list.append({
                 "id": workshop["id"],
                 "name": workshop["workshop_name"],
