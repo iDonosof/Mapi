@@ -41,6 +41,11 @@ class Commune(models.Model):
     def __str__(self):
         return self.commune_name
 
+    def __dict__(self):
+        return {
+            "commune_name": self.commune_name
+        }
+
 class Event_type(models.Model):
     event_type_name = models.CharField(max_length = 255, null = False, default = "")
     event_type_description = models.CharField(max_length = 255, null = True, default = "")
@@ -56,6 +61,7 @@ class Workshop_type(models.Model):
 
     def __str__(self):
         return self.workshop_type_name
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
@@ -118,6 +124,11 @@ class Workshop(models.Model):
     workshop_available = models.IntegerField(null = False, default = 1, choices = available)
     workshop_type = models.ForeignKey(Workshop_type, on_delete = models.SET_NULL, null = True, default = None)
     workshop_commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True, default = None)
+    one_stars = models.IntegerField(null = False, blank = False, default = 0)
+    two_stars = models.IntegerField(null = False, blank = False, default = 0)
+    three_stars = models.IntegerField(null = False, blank = False, default = 0)
+    four_stars = models.IntegerField(null = False, blank = False, default = 0)
+    five_stars = models.IntegerField(null = False, blank = False, default = 0)
 
     def __str__(self):
         return self.workshop_name
@@ -135,15 +146,20 @@ class Entertainment_areas(models.Model):
     area_commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True, default = None)
     area_start_time = models.TimeField(auto_now = False, auto_now_add = True, null = True)
     area_ended_time = models.TimeField(auto_now = False, auto_now_add = True, null = True)
+    one_stars = models.IntegerField(null = False, blank = False, default = 0)
+    two_stars = models.IntegerField(null = False, blank = False, default = 0)
+    three_stars = models.IntegerField(null = False, blank = False, default = 0)
+    four_stars = models.IntegerField(null = False, blank = False, default = 0)
+    five_stars = models.IntegerField(null = False, blank = False, default = 0)
 
     def __str__(self):
         return self.area_name
-
 
 class Comments(models.Model):
     username = models.CharField(max_length = 255, null = False, blank = False, default = "Sin nombre")
     event = models.ForeignKey(Event, null = True, on_delete = models.SET_NULL)
     workshop = models.ForeignKey(Workshop, null = True, on_delete = models.SET_NULL)
+    area = models.ForeignKey(Entertainment_areas, null = True, on_delete = models.SET_NULL)
     comment_date = models.DateField(auto_now_add = False, auto_now = True, null = False, blank = False)
     comment_time = models.TimeField(auto_now_add = False, auto_now = True, null = False, blank = False)
     likes = models.IntegerField(null = False, blank = False, default = 0)
