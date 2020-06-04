@@ -1,192 +1,163 @@
-var map;
-var directionsService, directionsRenderer;
-var miubicacion, interval, markerGlobal;
-var InforObj = [], htmlGoogle;
+var map, directionsService, directionsRenderer, miubicacion, htmlGoogle;
 
+var chileBounds = {
+  north: -17.2,
+  south: -57,
+  west: -79,
+  east: -65 ,
+};
 
-var events = [
-  {
-    eventName: "Holi", id:1 ,eventDescrip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quis sapien at arcu laoreet euismod. Donec faucibus ut mauris at blandit. Morbi blandit accumsan aliquet. Ut dapibus tincidunt sem et tincidunt. Quisque suscipit blandit nulla, ac tincidunt lectus pellentesque eu. Etiam accumsan porttitor aliquam. Mauris volutpat finibus tempus. Donec fermentum mattis nisl, nec varius neque blandit nec. Ut et mollis eros, nec semper sem. Quisque varius convallis leo, in luctus sem semper quis. Etiam dignissim suscipit massa et feugiat. Quisque placerat accumsan dictum. Quisque ac dui pretium, pretium est non, ultricies elit. Fusce non placerat lorem, nec laoreet dolor. Phasellus elementum convallis dolor, vel auctor ex sagittis eget. Maecenas at lectus at ipsum tempor bibendum eu nec dui. Sed eu nulla nec mi lacinia maximus. Curabitur id orci id sem efficitur hendrerit. Fusce rhoncus enim scelerisque lorem consequat, id mollis arcu tincidunt. Sed fringilla laoreet maximus. Cras erat odio, consequat nec consequat ut, vehicula non quam. Donec semper elit eu magna finibus, at interdum risus varius. Nam ac tortor a neque dapibus semper quis et lorem. Donec nunc risus, tristique sit amet felis faucibus, pulvinar viverra lacus. Aenean et lorem porttitor, semper quam eget, tempus magna. Proin augue metus, iaculis sed magna non, ultrices feugiat lectus. Aenean tempus sapien tortor, at elementum risus molestie at. Aliquam a felis sapien.", LatLng: [{lat: -33.5131875,lng: -70.7434274}]
-  },
-  {
-    eventName: "Holi", id:2 ,eventDescrip: "Holi", LatLng: [{lat: -33.5102713, lng: -70.7446505}]
-  },
-  {
-    eventName: "Holi", id:3 ,eventDescrip: "Holi", LatLng: [{lat: -33.5122013, lng: -70.7466005}]
-  },
-  {
-    eventName: "Holi", id:4 ,eventDescrip: "Holi", LatLng: [{lat: -33.5118882, lng: -70.7490976}]
-  },
-  {
-    eventName: "Holi", id:5 ,eventDescrip: "Holi", LatLng: [{lat: -33.5085687, lng: -70.7441473}]
-  },
-  {
-    eventName: "Holi", id:6 ,eventDescrip: "Holi", LatLng: [{lat: -33.4971285, lng: -70.7420424}]
-  },
-  {
-    eventName: "Holi", id:7 ,eventDescrip: "Holi", LatLng: [{lat: -33.4724315, lng: -70.7544879}]
-  },
-  {
-    eventName: "Holi", id:8 ,eventDescrip: "Holi", LatLng: [{lat: -33.516237, lng: -70.762556}]
-  },
-  {
-    eventName: "Holi", id:9 ,eventDescrip: "Holi", LatLng: [{lat:-33.471286, lng: -70.627287}]
-  },
-]; 
-
-
-function CenterControl(controlDiv) {
-  // Set CSS for the control border.
-  var controlUI = document.createElement('div');
-  controlUI.setAttribute("id", "controlUI");
-  controlUI.title = 'Click para iniciar el viaje';
-  controlDiv.appendChild(controlUI);
-
-  // Set CSS for the control interior.
-  var controlText = document.createElement('div');
-  controlText.setAttribute("id", "controlText");
-  controlText.innerHTML = 'Comenzar el viaje';
-  controlUI.appendChild(controlText);
-
-  // Setup the click event listeners: simply set the map to Chicago.
-  controlUI.addEventListener('click', function() {
-    window.open(htmlGoogle);
-  });
-}
-
+//Mapa que inicializa el mapa, sus configuraciones y los servicios de direcciones.
 function initMap() {
   directionsService = new google.maps.DirectionsService();
   directionsRenderer = new google.maps.DirectionsRenderer();
-
-  // Centra el mapa en Maipu
+  
   map = new google.maps.Map(
-    document.getElementById("map"), {zoom: 6.75, center: {lat: -33.2196658, lng: -70.6806571},
-    mapTypeId: google.maps.MapTypeId.ROADMA,
+    document.getElementById("map"), {zoom: 9, center: {lat: -33.4718926, lng: -70.8304006},
+    mapTypeId: 'styleMap',
+    restriction: {
+      latLngBounds: chileBounds,
+      strictBounds: false,
+    },
     disableDefaultUI: true,
     zoomControl: true,
     mapTypeControl: true,
+    mapTypeControlOptions: {
+      mapTypeIds: ['styleMap', 'satellite']
+    },
     streetViewControl: true,
   });
-  // Create the DIV to hold the control and call the CenterControl()
-  // constructor passing in this DIV.
+
+  directionsRenderer.setMap(map);
+
+  map.mapTypes.set('styleMap', new google.maps.StyledMapType(styleMap, { name: 'Mapi Map' }));
+
   var centerControlDiv = document.createElement('div');
   var centerControl = new CenterControl(centerControlDiv, map);
 
   centerControlDiv.index = 1;
-  map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
-  directionsRenderer.setMap(map);
-  addEvents();
+  map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(centerControlDiv);
+
+  addEvents()
 }
 
-// function openPanel(){
-//   document.getElementById('menuPanel').style.width="0px";
-//   document.getElementById('btnPanel').style.marginLeft="50vh";
-//   document.getElementById('btnPanel').innerHTML="Pulse en la X para Cerrar";
-// }
+// Funcion para crear el boton de centrar, se crea el div contenedor, y un div dentro con el texto para mayor personalizacion
 
-// function closePanel(){
-//   document.getElementById('menuPanel').style.width="0px";
-//   document.getElementById('btnPanel').style.marginLeft="0vh";
-// }
+function CenterControl(controlDiv, map) {
 
+  var centerControl = document.createElement('div');
+  centerControl.style.backgroundColor = '#fff';
+  centerControl.style.border = '2px solid #fff';;
+  centerControl.style.borderRadius = '3px';
+  centerControl.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  centerControl.style.cursor = 'pointer';
+  centerControl.style.marginBottom = '22px';
+  centerControl.style.marginRight = '10px';
+  centerControl.style.textAlign = 'center';
+  centerControl.title = 'Pincha el boton para centrar tu ubicacion';
+  controlDiv.appendChild(centerControl);
+
+  var centercControlText = document.createElement('div');
+  centercControlText.style.color = 'rgb(25,25,25)';
+  centercControlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+  centercControlText.style.fontSize = '16px';
+  centercControlText.style.lineHeight = '38px';
+  centercControlText.innerHTML = "<i class=material-icons style=font-size:36px>gps_fixed</i>";
+  centerControl.appendChild(centercControlText);
+
+  centerControl.addEventListener('click', function() {
+    map.setCenter(miubicacion);
+  });
+}
+
+
+// Funcion que trae las cordenadas desde la api y las coloca en el mapa, junto con la animacion bounce y se le agrega una funcion click para abrir tarjeta
 function addEvents(){
-  for (var i = 0; i < events.length; i++) {
-    // var contentString = '<div id="content"><h1>'+ events[i].eventName +'</h1><p>'+ events[i].eventDescrip +'</p> <p>'+ events[i].id +'</p> </div><button onClick="calcRoute('+ i +');">Ver Camino</button> <button id="btnPanel" onClick="openPanel('+i+')">Ver Más</button>  <button id="btnCerrar" onClick="cerrarPanel()">Cerrar</button>';
-    const markerEvents = new google.maps.Marker({
-        id: events[i].id,
-        position: events[i].LatLng[0],
-        animation: google.maps.Animation.DROP,
-        map: map
-    });
+  var groupMarkers = [];
+  var markerEvents;
+  fetch('http://127.0.0.1:8000/api/events/list')
+  .then( res => res.json())
+  .then(events => {
 
-    // const infowindow = new google.maps.InfoWindow({
-    //     content: contentString,
-    //     maxWidth: 200,
-    // });
+    for (var i = 0; i < events.length; i++) {       
 
-    markerEvents.addListener('click', function () {
-      abrirPanel();
-      // document.getElementById("menuPanel").innerHTML=contentString;
-    });
-  }
+      LatLng = [{lat: parseFloat(events[i].latitude), lng: parseFloat(events[i].longitude)}]
+
+      markerEvents = new google.maps.Marker({
+          id: events[i].id,
+          position: LatLng[0],
+          title:"Mi posicion",
+          map: map 
+      });
+
+      markerEvents.addListener('click', function () {
+        openPanel();
+      });
+      groupMarkers.push(markerEvents)
+    }
+
+    var markerCluster = new MarkerClusterer(map, groupMarkers,
+      {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+  }) 
 }
 
-function abrirPanel(){
+
+// Funcion que abre y cierra la tarjeta de evento al hacerle click
+function openPanel(){
   document.getElementById("menuPanel").style.width="100%";
 }
-
 function cerrarPanel(){
   document.getElementById("menuPanel").style.width="0%";
 }
 
-function closeOtherInfo() {
-  if (InforObj.length > 0) {
-      InforObj[0].set("marker", null);
-      InforObj[0].close();
-      InforObj.length = 0;   
-  }
-}
 
+// Funcion que inicializa el GPS, consigue la posicion y la marca en el mapa, si no, arroja una alerta con el error obtenido.
 function initGps()
   {
-    interval = setInterval(function(){   
-      if (navigator.geolocation)
+    if (navigator.geolocation)
       {
-      navigator.geolocation.getCurrentPosition(updatePosition,showError);   
+      navigator.geolocation.getCurrentPosition(setMyPosition,showError);
       }
-      else{
-        clearInterval(interval)
-      }
-    }, 3000)  
   }
 
-function updatePosition(position)
+function setMyPosition(position)
   {
     miubicacion = {
       lat: position.coords.latitude,
       lng: position.coords.longitude
     };
-    updateGps(miubicacion);
+
+    var markerGps = new google.maps.Marker({
+      position: miubicacion,
+      title:"Mi posicion"
+    });
+
+    markerGps.setMap(map);
+    map.setCenter(miubicacion);
+    map.setZoom(16);
   }
 
 function showError(error){
-  if(sessionStorage.getItem("Permission")=="0")
-  {
-    return false
-  }
   var mes = "";
   switch(error.code) 
     {
     case error.PERMISSION_DENIED:
-      mes="El usuario a denegado el permiso de GPS";
+      mes="Por favor activa GPS para acceder a toda la funcionalidad del mapa";
       break;
     case error.POSITION_UNAVAILABLE:
       mes="La posicion esta inhabilitada";
       break;
     case error.TIMEOUT:
-      mes="Se ha sobrepasado el tiempo limite para el GPS";
+      mes="Se ha sobrepasado el tiempo limite de espera para el GPS";
       break;
     case error.UNKNOWN_ERROR:
       mes="Error de GPS desconocido";
       break;
     }
     alert(mes)
-    sessionStorage.setItem("Permission", "0");
-    clearInterval(interval)
 }
 
-function updateGps(miubicacion){
-  var markerGps = new google.maps.Marker({
-    position: miubicacion,
-    title:"Mi posicion"
-  });
-  if(this.miubicacionMarker) {
-    miubicacionMarker.setMap(null);; 
-  }     
-  markerGps.setMap(map);
-  this.miubicacionMarker = markerGps;
-}
-
+// Funcion que calcula la ruta entre mi posicion del gps y la del evento, luego hace visible el boton de ruta para abrir google maps con la ruta creada
 function calcRoute(i) {  
     var start = miubicacion;
     var end = events[i].LatLng[0];
@@ -207,6 +178,6 @@ function calcRoute(i) {
         }
       });
     } else{
-      alert("No tenemos acceso a tu ubicacion aun, revisa que hayas dado permiso al GPS")
+      alert("No tenemos acceso a tu ubicacion aun, revisa que hayas dado permiso al GPS para usar esta funcion")
     }
 }
