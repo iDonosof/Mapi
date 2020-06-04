@@ -323,4 +323,61 @@ html, body {
 .contentPanel {
   margin-top: 10%; }
 
+#iconGps, #iconEvents {
+  width: 36px;
+  height: 36px; }
+
+#openEventsControl {
+  background-color: #fff;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  margin-bottom: 30px;
+  margin-right: 10px; }
+
+#searchBarControl {
+  margin-top: 8px;
+  padding: 0; }
+
+#searchBarButton {
+  cursor: pointer;
+  height: 40px;
+  background-color: whitesmoke;
+  border-color: whitesmoke;
+  border-left-color: gray;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: 15%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
+
+#searchBarInput {
+  height: 38px;
+  border: 2px solid #fff;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  width: 60%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
+
+#centerControl, #obtainGpsControl {
+  background-color: #fff;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  margin-bottom: 22px;
+  margin-right: 10px; }
+
+@media only screen and (max-width: 550px) {
+  #searchBarButton {
+    width: 25%; }
+  #searchBarInput {
+    width: 50%; } }
+
+@media only screen and (min-width: 900px) {
+  #searchBarButton {
+    width: 80px; }
+  #searchBarInput {
+    width: 400px; } }
+
 /*# sourceMappingURL=main.css.map */
