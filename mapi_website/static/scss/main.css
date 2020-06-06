@@ -307,6 +307,31 @@ html, body {
   right: 25px;
   font-size: 36px; }
 
+.rightPanel {
+  margin-top: 97px;
+  height: 86%;
+  width: 0px;
+  background: linear-gradient(-120deg, #dcdde1, #f5f6fa);
+  opacity: 85%;
+  overflow-x: hidden;
+  transition: all 1s;
+  z-index: 1;
+  float: right; }
+  .rightPanel a {
+    padding: 8px 8px 8px 64px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #2d3436;
+    display: block; }
+
+.rightPanel a:hover {
+  color: #2c3e50; }
+
+.rightPanel .closebtn {
+  top: 0px;
+  right: 25px;
+  font-size: 36px; }
+
 .closebtn:active {
   background: rgba(0, 0, 0, 0); }
 
@@ -338,11 +363,12 @@ html, body {
 
 #searchBarControl {
   margin-top: 8px;
-  padding: 0; }
+  padding: 0;
+  height: 38px; }
 
 #searchBarButton {
   cursor: pointer;
-  height: 40px;
+  height: 38px;
   background-color: whitesmoke;
   border-color: whitesmoke;
   border-left-color: gray;
@@ -357,7 +383,8 @@ html, body {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   width: 60%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-size: 16px; }
 
 #centerControl, #obtainGpsControl {
   background-color: #fff;
@@ -378,6 +405,21 @@ html, body {
   #searchBarButton {
     width: 80px; }
   #searchBarInput {
-    width: 400px; } }
+    width: 400px;
+    font-size: 24px; } }
+
+#listEvents {
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  float: left;
+  width: 25%;
+  margin-left: 6.25%;
+  margin-bottom: 6.25%;
+  height: 50%;
+  text-align: center; }
+
+.panelContentR {
+  background-color: black; }
 
 /*# sourceMappingURL=main.css.map */

@@ -1,4 +1,4 @@
-var map, directionsService, directionsRenderer, miubicacion, htmlGoogle;
+var map, directionsService, directionsRenderer, miubicacion, htmlGoogle, nearEvents = [];
 
 var chileBounds = {
   north: -17.2,
@@ -51,7 +51,7 @@ function initMap() {
 }
 
 
-// Funcion para crear el boton de centrar, se crea el div contenedor, y un div dentro con el texto para mayor personalizacion
+// Funciones para crear todos los botones custom del mapa
 function obtainGpsControl(controlDiv, map) {
 
   var obtainGpsControl = document.createElement('div');
@@ -130,7 +130,14 @@ function openEventsControl(controlDiv, map) {
   openEventsControl.appendChild(openEventsText);
 
   openEventsControl.addEventListener('click', function() {
-    calcNearEvents()
+    if(miubicacion == undefined){
+      openPanelR();
+    }else{
+      calcNearEvents();
+      setTimeout(function(){
+        openPanelR();
+      }, 2000);
+    }
   });
 }
 
@@ -144,7 +151,7 @@ function rangoGps(){
     fillOpacity: 0.35,
     map: map,
     center: miubicacion,
-    radius: 1000
+    radius: 1500
   });  
 }
 
@@ -183,10 +190,30 @@ function addEvents(){
 function openPanel(){
   document.getElementById("menuPanel").style.width="100%";
 }
-function cerrarPanel(){
+function closePanel(){
   document.getElementById("menuPanel").style.width="0%";
 }
 
+// Funcion que abre y cierra la lista de eventos cercanos o todos al hacerle click
+function openPanelR(){
+  document.getElementById("menuPanelR").style.width="100%";
+  if(nearEvents[1]==undefined){
+    showAllEvents();
+  }
+  else{
+    showNearEvents();
+  }
+}
+function closePanelR(){
+  document.getElementById("menuPanelR").style.width="0%";
+  setTimeout(function(){
+    card = document.querySelector(".panelContentR");
+    card.querySelectorAll('*').forEach(n => n.remove());
+  }, 1000); 
+
+}
+
+//Funcion que busca mi posicion y la pone en el mapa
 function setMyPosition(position)
   {
     miubicacion = {
@@ -205,6 +232,7 @@ function setMyPosition(position)
     rangoGps()
   }
 
+// Funcion que muestra los errores del gps
 function showError(error){
   var mes = "";
   switch(error.code) 
@@ -249,43 +277,90 @@ function calcRoute(i) {
     }
 }
 
-// function calcNearEvents(){
+// Funcion que trae los eventos mas cercanos desde tu posicion en un rango de 1500 metros
+ function calcNearEvents(){
+  const R = 6371;
+  const pi = Math.PI;
+  nearEvents = [];
 
-//   const R = 6371;
+  fetch('http://127.0.0.1:8000/api/events/list')
+  .then( res => res.json())
+  .then(events => {
+    for (var i = 0; i < events.length; i++) {  
 
-//   fetch('http://127.0.0.1:8000/api/events/list')
-//   .then( res => res.json())
-//   .then(events => {
+      const lat1 = miubicacion.lat;
+      const lon1 = miubicacion.lng;
 
-//     for (var i = 0; i < events.length; i++) {  
+      const lat2 = parseFloat(events[i].latitude);
+      const lon2 = parseFloat(events[i].longitude);
 
-//       const lat2 = parseFloat(events[i].latitude);
-//       const lon2 = parseFloat(events[i].longitude);
-//       const lat1 = miubicacion.lat;
-//       const lon1 = miubicacion.lng;
+      const chLat = lat2-lat1;
+      const chLon = lon2-lon1;
 
-//       const radiolat1 = lat1 * Math.PI/180;
-//       const radiolat2 = lat2 * Math.PI/180;
-//       const dlat = (lat2-lat1) * Math.PI/180;
-//       const dlon = (lon2-lon1) * Math.PI/180;
-    
-//       const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(radiolat1) * Math.cos(radiolat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
-    
-//       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    
-//       const d = R * c;
+      const dLat = chLat*(pi/180);
+      const dLon = chLon*(pi/180);
 
-//         var mlat = map.markers[i].position.lat();
-//         var mlng = map.markers[i].position.lng();
-        
-//         var dLat  = rad(mlat - lat);
-//         var dLong = rad(mlng - lng);
+      const rLat1 = lat1*(pi/180);
+      const rLat2 = lat2*(pi/180);
 
-//         var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                  Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(rLat1) * Math.cos(rLat2); 
 
-//         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-//         var d = R * c;
-      
-//     }
-//   })
-// }
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      const d = R * c;
+      console.log(d);
+      if(d < 2.6){
+        nearEvents.push(events[i]);
+      }
+    }
+  })
+  
+  
+}
+
+//Funcion que añade los eventos cercanos a la lista
+function showNearEvents(){
+
+  card = document.querySelector(".panelContentR");
+  for (var i = 0; i < nearEvents.length; i++) {
+    listNear = document.createElement('div');
+    listNear.id = "listEvents";
+    listNear.innerHTML = "<h1>"+nearEvents[i].name+"</h1><img src='static/img/futbol.jpg' alt='caca'>";
+    card.appendChild(listNear);
+  }
+}
+
+//Funcion que trae todos los eventos para mostrar
+function showAllEvents(){
+
+  card = document.querySelector(".panelContentR");
+  
+  fetch('http://127.0.0.1:8000/api/events/list')
+  .then( res => res.json())
+  .then(events => {
+    for (var i = 0; i < events.length; i++) {  
+      listAll = document.createElement('div');
+      listAll.id = "listEvents";
+      listAll.innerHTML = "<h1>"+events[i].name+"</h1><img src='static/img/futbol.jpg' alt='caca'>";
+      card.appendChild(listAll);
+    }
+  })
+}
+
+// Funcion que filtra los eventos en la lista
+function myFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("myUL");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+}
