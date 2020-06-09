@@ -1,4 +1,4 @@
-var map, directionsService, directionsRenderer, miubicacion, htmlGoogle;
+var map, directionsService, directionsRenderer, miubicacion, htmlGoogle, nearEvents = [], groupMarkers = [];
 
 var chileBounds = {
   north: -17.2,
@@ -21,11 +21,6 @@ function initMap() {
     },
     disableDefaultUI: true,
     zoomControl: true,
-    mapTypeControl: true,
-    mapTypeControlOptions: {
-      mapTypeIds: ['styleMap', 'satellite'],
-      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-    },
     streetViewControl: true,
   });
 
@@ -42,6 +37,7 @@ function initMap() {
   map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(openEventsDiv);
 
   var searchControlDiv = document.createElement('div');
+  var mapdiv = new mapTypeControl(searchControlDiv, map);
   searchControlDiv.id = 'searchBarControl';
   searchControlDiv.className = 'col-sm-8';
   var srcControl = searchBarControl(searchControlDiv, map);
@@ -51,7 +47,7 @@ function initMap() {
 }
 
 
-// Funcion para crear el boton de centrar, se crea el div contenedor, y un div dentro con el texto para mayor personalizacion
+// Funciones para crear todos los botones custom del mapa
 function obtainGpsControl(controlDiv, map) {
 
   var obtainGpsControl = document.createElement('div');
@@ -71,6 +67,51 @@ function obtainGpsControl(controlDiv, map) {
     }else
       alert("Por favor activa el gps o acepta el permiso para acceder a esta funcionalidad")
   });
+}
+
+function mapTypeControl(controlDiv, map){
+  var typeButton = document.createElement('button');
+  typeButton.className = 'dropbtn';
+  typeButton.title = 'Seleciona la vista del mapa';
+  typeButton.innerHTML = 'Tipo de mapa';
+  controlDiv.appendChild(typeButton);
+
+  var typeDiv = document.createElement('div');
+  typeDiv.className = 'dropdown-content';
+  typeDiv.id = 'myDropdown';
+  typeButton.appendChild(typeDiv);
+
+  var mapiA = document.createElement('a');
+  mapiA.innerHTML = 'Mapi Map';
+  typeDiv.appendChild(mapiA);
+
+  var satelliteiA = document.createElement('a');
+  satelliteiA.innerHTML = 'Satelital';
+  typeDiv.appendChild(satelliteiA);
+
+  typeButton.addEventListener('click', function() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  });
+  mapiA.addEventListener('click', function() {
+    map.setMapTypeId('styleMap');
+  });
+  satelliteiA.addEventListener('click', function() {
+    map.setMapTypeId('satellite');
+  });
+}
+
+//Funcion que cierra el Drop menu del tipo al hacer click en la pantalla
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }
 
 function searchBarControl(controlDiv) {
@@ -130,7 +171,14 @@ function openEventsControl(controlDiv, map) {
   openEventsControl.appendChild(openEventsText);
 
   openEventsControl.addEventListener('click', function() {
-    calcNearEvents()
+    if(miubicacion == undefined){
+      openPanelR();
+    }else{
+      calcNearEvents();
+      setTimeout(function(){
+        openPanelR();
+      }, 2000);
+    }
   });
 }
 
@@ -144,13 +192,12 @@ function rangoGps(){
     fillOpacity: 0.35,
     map: map,
     center: miubicacion,
-    radius: 1000
+    radius: 1500
   });  
 }
 
 // Funcion que trae las cordenadas desde la api y las coloca en el mapa, junto con la animacion bounce y se le agrega una funcion click para abrir tarjeta
 function addEvents(){
-  var groupMarkers = [];
   var markerEvents;
   fetch('http://127.0.0.1:8000/api/events/list')
   .then( res => res.json())
@@ -163,14 +210,18 @@ function addEvents(){
       markerEvents = new google.maps.Marker({
           id: events[i].id,
           position: LatLng[0],
-          title:"Mi posicion",
-          map: map 
+          title: events[i].name,
+          map: map,
+          type: events[i].table
       });
+      markerEvents.customInfo = events[i].id+","+events[i].table +","+ events[i].latitude+","+ events[i].longitude;
 
-      markerEvents.addListener('click', function () {
-        openPanel();
+      google.maps.event.addListener(markerEvents, 'click', function () {
+        openPanel(this.customInfo);
       });
       groupMarkers.push(markerEvents)
+
+
     }
 
     var markerCluster = new MarkerClusterer(map, groupMarkers,
@@ -180,13 +231,55 @@ function addEvents(){
 
 
 // Funcion que abre y cierra la tarjeta de evento al hacerle click
-function openPanel(){
-  document.getElementById("menuPanel").style.width="100%";
+function openPanel(customInfo){
+  document.getElementById("menuPanel").style.width="50%";
+  document.getElementById("map").style.width="50%";
+  document.getElementById("map").style.marginLeft="50%";
+  document.getElementById("map").style.transition= "all 1s";
+  showDetailEvent(customInfo)
 }
-function cerrarPanel(){
+function closePanel(){
   document.getElementById("menuPanel").style.width="0%";
+  document.getElementById("map").style.width="100%";
+  document.getElementById("map").style.marginLeft="0";
+  document.getElementById("map").style.transition= "all 1s";
+  setTimeout(function(){
+    detailContent = document.querySelector(".panelContent");
+    detail = detailContent.querySelector("#detailEvent");
+    detailContent.removeChild(detail);
+  }, 1000); 
 }
 
+// Funcion que abre y cierra la lista de eventos cercanos o todos al hacerle click
+function openPanelR(){
+  var detailContent = document.querySelector(".panelContent");
+  var detail = detailContent.querySelector("#detailEvent");
+  document.getElementById("menuPanel").style.width="0%";
+  document.getElementById("map").style.width="100%";
+  document.getElementById("map").style.marginLeft="0";
+  document.getElementById("menuPanelR").style.width="100%";
+  if(nearEvents[0]==undefined){
+    document.getElementById("neartEventsBtn").disabled=true;
+  }
+  else document.getElementById("neartEventsBtn").disabled=false;
+  showAllEvents();
+  if(detail!==null){
+    setTimeout(function(){
+      detailContent.removeChild(detail);
+    }, 1000);
+  }
+}
+
+function closePanelR(){
+  document.getElementById("menuPanelR").style.width="0%";
+  setTimeout(function(){
+    card = document.querySelector(".eventListTable");
+    card.querySelectorAll('*').forEach(n => n.remove());
+  }, 1000); 
+
+}
+
+//Funcion que busca mi posicion y la pone en el mapa
 function setMyPosition(position)
   {
     miubicacion = {
@@ -205,6 +298,7 @@ function setMyPosition(position)
     rangoGps()
   }
 
+// Funcion que muestra los errores del gps
 function showError(error){
   var mes = "";
   switch(error.code) 
@@ -249,43 +343,203 @@ function calcRoute(i) {
     }
 }
 
-// function calcNearEvents(){
+// Funcion que trae los eventos mas cercanos desde tu posicion en un rango de 1500 metros
+ function calcNearEvents(){
+  const R = 6371;
+  const pi = Math.PI;
+  nearEvents = [];
 
-//   const R = 6371;
+  fetch('http://127.0.0.1:8000/api/events/list')
+  .then( res => res.json())
+  .then(events => {
+    for (var i = 0; i < events.length; i++) {  
 
-//   fetch('http://127.0.0.1:8000/api/events/list')
-//   .then( res => res.json())
-//   .then(events => {
+      const lat1 = miubicacion.lat;
+      const lon1 = miubicacion.lng;
 
-//     for (var i = 0; i < events.length; i++) {  
+      const lat2 = parseFloat(events[i].latitude);
+      const lon2 = parseFloat(events[i].longitude);
 
-//       const lat2 = parseFloat(events[i].latitude);
-//       const lon2 = parseFloat(events[i].longitude);
-//       const lat1 = miubicacion.lat;
-//       const lon1 = miubicacion.lng;
+      const chLat = lat2-lat1;
+      const chLon = lon2-lon1;
 
-//       const radiolat1 = lat1 * Math.PI/180;
-//       const radiolat2 = lat2 * Math.PI/180;
-//       const dlat = (lat2-lat1) * Math.PI/180;
-//       const dlon = (lon2-lon1) * Math.PI/180;
+      const dLat = chLat*(pi/180);
+      const dLon = chLon*(pi/180);
+
+      const rLat1 = lat1*(pi/180);
+      const rLat2 = lat2*(pi/180);
+
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                  Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(rLat1) * Math.cos(rLat2); 
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      const d = R * c;
+      if(d < 1.6){
+        nearEvents.push(events[i]);
+      }
+    }
+  })
+}
+
+//Funcion que muestra el detalle del evento al hacerle click
+function showDetailEvent(customInfo){
+  detail = document.querySelector(".panelContent")
+  var id = customInfo.split(',')[0];
+  var typeEvent = customInfo.split(',')[1];
+
+  fetch('http://127.0.0.1:8000/api/events/detail/'+typeEvent+'/'+id)
+  .then( res => res.json())
+  .then(events => {
+    detailEvent = document.createElement('div');
+    detailEvent.id = "detailEvent";
+    detailEvent.innerHTML = 
+      `<h1>${events.name}</h1>
+      <img src='/media/workshops/2020/06/08/curso-online-pasteleria-reposteria_amp_primaria_1_1560502963.jpg' alt='caca'>
+      <b><p>Comuna:</b> ${events.commune}</p>
+      <b><p>Tipo de evento:</b> ${typeEvent} - ${events.type}</p>
+      <b><p>Descripcion:</b>  ${events.description}</p>
+      <b><p>Direccion:</b>  ${events.address}</p>
+      <b><p>Inicio:</b>  ${events.start_date}, ${events.start_time}</p>
+      <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p>
+      <b><p>Puntuaciones:</b></p>
+      <p><img id="starsImg" src="static/img/5stars.png" alt="5 estrellas imagen"> = <b>${events.five_stars}</b></p>
+      <p><img id="starsImg" src="static/img/4stars.png" alt="4 estrellas imagen"> = <b>${events.four_stars}</b></p>
+      <p><img id="starsImg" src="static/img/3stars.png" alt="3 estrellas imagen"> = <b>${events.three_stars}</b></p>
+      <p><img id="starsImg" src="static/img/2stars.png" alt="2 estrellas imagen"> = <b>${events.two_stars}</b></p>
+      <p><img id="starsImg" src="static/img/1stars.png" alt="1 estrellas imagen"> = <b>${events.one_stars}</b></p>
+      <h1>Comentarios de la gente</h1>
+      <p>${events.comments}</p>`;
+
+    detail.appendChild(detailEvent);
+   })
+}
+
+//Funcion que añade los eventos cercanos a la lista
+function showNearEvents(){
+
+  card = document.querySelector(".eventListTable");
+  for (var i = 0; i < nearEvents.length; i++) {
+    listNear = document.createElement('li');
+    listNear.id = "listEvents";
+    listNear.innerHTML = "<h1>"+nearEvents[i].name+"</h1><img src='static/img/futbol.jpg' alt='caca'><p>Tipo de evento:"+events[i].table+"</p>";
+    card.appendChild(listNear);
+  }
+}
+
+//Funcion que trae todos los eventos para mostrar
+async function showAllEvents(){
+
+  card = document.querySelector(".eventListTable");
+
+  for (var i = 0; i < groupMarkers.length; i++){
+    var id = groupMarkers.id;
+    var caca = groupMarkers[i];
+
+    await fetch('http://127.0.0.1:8000/api/events/detail/'+groupMarkers[i].type+'/'+groupMarkers[i].id)
+    .then( res => res.json())
+    .then(events => {
+      listAll = document.createElement('li');
+      listAll.id = "listEvents";
+      listAll.innerHTML = 
+        `<h1 onclick="centerEventClick(${events.longitude}, ${events.latitude})">${events.name}</h1>
+        <img src='/media/workshops/2020/06/08/curso-online-pasteleria-reposteria_amp_primaria_1_1560502963.jpg' alt='caca'>
+        <b><p>Comuna:</b> ${events.commune}</p>
+        <b><p>Categoria de evento:</b>${events.type}</p>
+        <b><p>Tipo de evento:</b>${groupMarkers[i].type}</p>
+        <b><p>Descripcion:</b>  ${events.description}</p>
+        <b><p>Inicio:</b>  ${events.start_date}, ${events.start_time}</p>
+        <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p>`;
+      card.appendChild(listAll);  
+    })    
+  }
+}
+
+
+//Funcion que al clickear el titulo del evento lo centra en el mapa
+function centerEventClick(lng, lat){
+  closePanelR()
+  LatLng = [{lat: parseFloat(lat), lng: parseFloat(lng)}]
+  latE = lat;
+  lngE = lng;
+
+  map.setCenter(LatLng[0]);
+  map.setZoom(18);
+
+  for (i = 0; i < groupMarkers.length; i++){
     
-//       const a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(radiolat1) * Math.cos(radiolat2) * Math.sin(dlon/2) * Math.sin(dlon/2);
+    if(latE===parseFloat(groupMarkers[i].customInfo.split(',')[2]) & lngE===parseFloat(groupMarkers[i].customInfo.split(',')[3]) ){
+      groupMarkers[i].setAnimation(google.maps.Animation.BOUNCE);
+      eventCircle = new google.maps.Circle({
+        strokeWeight: 0,
+        fillColor: 'red',
+        fillOpacity: 0.35,
+        map: map,
+        center: {lat: parseFloat(groupMarkers[i].customInfo.split(',')[2]), lng: parseFloat(groupMarkers[i].customInfo.split(',')[3])},
+        radius: 40
+      });  
+      resetMarker(groupMarkers, i, eventCircle)
+    }
+  }
+}
+
+//Funcion que quita la animacion y circulo en 4 segundos
+function resetMarker(mark, i, eventCircle){
+  setTimeout(() => {      
+    eventCircle.setMap(null);
+    mark[i].setAnimation(null); 
+  }, 4000);
+}
+
+// Funcion que filtra los eventos en la lista por nombre
+
+function nameFilterEvent() {
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById("filterInputName");
+  filter = input.value.toUpperCase();
+
+  ul = document.getElementsByClassName("eventListTable");
+  li = ul[0].getElementsByTagName("li");
+  
+  for (i = 0; i < li.length; i++) {
+      a = li[i].getElementsByTagName("h1")[0];
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+  }
+}
+
+
+// Funciones para filtar los eventos por tipo de evento
+
+function buttonFilterEvent(type) {
+  
+  var filter, ul, li, i, txtValue, txtValue1, txtValue2;
+  filter = type.toUpperCase();
+  input = document.getElementById("filterInputName");
+  input.value = '';
+  ul = document.getElementsByClassName("eventListTable");
+  li = ul[0].getElementsByTagName("li");
+
+    for (i = 0; i < li.length; i++) {
+      p = li[i].getElementsByTagName("p")[1];
     
-//       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    
-//       const d = R * c;
 
-//         var mlat = map.markers[i].position.lat();
-//         var mlng = map.markers[i].position.lng();
-        
-//         var dLat  = rad(mlat - lat);
-//         var dLong = rad(mlng - lng);
+      txtValue = p.textContent.split(':')[1];
+      txtValue1 = txtValue.split('-')[0];
+      // txtValue2 = txtValue.split('-')[1];
 
-//         var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
-
-//         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-//         var d = R * c;
-      
-//     }
-//   })
-// }
+      if (txtValue1.toUpperCase().indexOf(filter) > -1)  {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+      if (filter=="ALL"){
+        li[i].style.display = "";
+      }
+      if(nearEvents[1]==undefined & filter=="NEAR"){
+      }
+    }
+}
