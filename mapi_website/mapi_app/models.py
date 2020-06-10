@@ -41,14 +41,9 @@ class Commune(models.Model):
     def __str__(self):
         return self.commune_name
 
-    def __dict__(self):
-        return {
-            "commune_name": self.commune_name
-        }
-
 class Event_type(models.Model):
     event_type_name = models.CharField(max_length = 255, null = False, default = "")
-    event_type_description = models.CharField(max_length = 255, null = True, default = "")
+    event_type_description = models.TextField(null = True, default = "")
     event_type_icon = models.ImageField(upload_to = "events_type/%Y/%m/%d", blank = True, null = True)
 
     def __str__(self):
@@ -56,7 +51,7 @@ class Event_type(models.Model):
 
 class Workshop_type(models.Model):
     workshop_type_name = models.CharField(max_length = 255, null = False, default = "")
-    workshop_type_description = models.CharField(max_length = 255, null = True, default = "")
+    workshop_type_description = models.TextField(null = True, default = "")
     workshop_type_icon = models.ImageField(upload_to = "workshop_type/%Y/%m/%d", blank = True, null = True)
 
     def __str__(self):
@@ -66,7 +61,7 @@ class Workshop_type(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     phone_number = models.IntegerField(null = True)
-    address = models.CharField(max_length = 300, null = True)
+    address = models.CharField(max_length = 500, null = True)
     birthday = models.DateField(auto_now = False, auto_now_add = True, null = True)
     marital_situation = models.IntegerField(null = True, default = 4, choices = marital_situation)
     gender = models.IntegerField(null = True, default = 2, choices = gender)
@@ -91,7 +86,7 @@ class Event(models.Model):
     event_coordinates_longitude = models.CharField(max_length = 100, null = False, blank = False)
     event_coordinates_latitude = models.CharField(max_length = 100, null = False, blank = False)
     event_quotas = models.IntegerField(null = False, blank = False, default = -1)
-    event_description = models.CharField(max_length = 500, null = True, blank = True, default = "Sin descripción")
+    event_description = models.TextField(null = True, blank = True, default = "Sin descripción")
     event_start_date = models.DateField(auto_now = False, auto_now_add = True, null = False)
     event_ended_date = models.DateField(auto_now = False, auto_now_add = True, null = False)
     event_start_time = models.TimeField(auto_now = False, auto_now_add = True, null = False)
@@ -115,7 +110,7 @@ class Workshop(models.Model):
     workshop_coordinates_longitude = models.CharField(max_length = 100, null = False, blank = False)
     workshop_coordinates_latitude = models.CharField(max_length = 100, null = False, blank = False)
     workshop_quotas = models.IntegerField(null = False, blank = False, default = -1)
-    workshop_description = models.CharField(max_length = 500, null = True, blank = True, default = "Sin descripción")
+    workshop_description = models.TextField(null = True, blank = True, default = "Sin descripción")
     workshop_days = models.CharField(max_length = 13, null = False, blank = False, default = "Sin especificar")
     workshop_start_date = models.DateField(auto_now = False, auto_now_add = True, null = False)
     workshop_ended_date = models.DateField(auto_now = False, auto_now_add = True, null = False)
@@ -140,7 +135,7 @@ class Entertainment_areas(models.Model):
     icon_route = models.ImageField(upload_to = "areas/icons/%Y/%m/%d" , blank = True, null = True)
     area_coordinates_longitude = models.CharField(max_length = 100, null = False, blank = False)
     area_coordinates_latitude = models.CharField(max_length = 100, null = False, blank = False)
-    area_description = models.CharField(max_length = 500, null = True, blank = True, default = "Sin descripción")
+    area_description = models.TextField(null = True, blank = True, default = "Sin descripción")
     area_days = models.CharField(max_length = 13, null = False, blank = False, default = "Sin especificar")
     area_available = models.IntegerField(null = False, default = 1, choices = available)
     area_commune = models.ForeignKey(Commune, on_delete = models.SET_NULL, null = True, default = None)
@@ -171,7 +166,7 @@ class Logs(models.Model):
     user = models.CharField(max_length = 10, null = False, blank = False, default = "Sin identificar")
     table_name = models.CharField(max_length = 100, null = False, blank = False, default = "Sin identificar")
     action = models.CharField(max_length = 100, null = False, blank = False, default = "Sin especificar")
-    description = models.CharField(max_length = 500, null = True, blank = True, default = "Sin descripción")
+    description = models.TextField(null = True, blank = True, default = "Sin descripción")
     log_date = models.DateField(auto_now_add = False, auto_now = False, null = False, blank = False, default = timezone.now)
     log_time = models.TimeField(auto_now_add = False, auto_now = False, null = False, blank = False, default = timezone.now)
 
