@@ -12,9 +12,11 @@ from .helper import Json
 from .response_http import Bad_request, Internal_server_error, Not_found, Ok
 from .models import Event, Entertainment_areas, Workshop, Commune, Event_type, Workshop_type, Comments
 
-@require_GET
+import json
+
+@require_POST
 def home(request):
-    return Json({Ok("Test api rest"), list(User.objects.all().values())})
+    return Json('It works!')
 
 
 @require_GET
@@ -225,3 +227,32 @@ def event_details(request, table, id):
             return Json(area)
         except:
             pass
+
+@require_POST
+def searcher(request):
+    body = json.loads(request.body)
+    recommendation = []
+    events = Event.objects.filter(event_name__contains = body.get("words")).values("id", "event_name")
+    for event in events.values():
+        recommendation.append({
+            "id": event["id"],
+            "name": event["event_name"],
+            "table": "Evento"
+        })
+
+    workshops = Workshop.objects.filter(workshop_name__contains = body.get("words")).values("id", "workshop_name")
+    for workshop in workshops.values():
+        recommendation.append({
+            "id": workshop["id"],
+            "name": workshop["workshop_name"],
+            "table": "Taller"
+        })
+
+    areas = Entertainment_areas.objects.filter(area_name__contains = body.get("words")).values("id", "area_name")
+    for area in areas.values():
+        recommendation.append({
+            "id": area["id"],
+            "name": area["area_name"],
+            "table": "Area"
+        })
+    return Json(recommendation)
