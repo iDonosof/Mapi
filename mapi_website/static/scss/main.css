@@ -493,4 +493,7 @@ html, body {
 .show {
   display: block; }
 
+#cordsFilter {
+  display: none; }
+
 /*# sourceMappingURL=main.css.map */
