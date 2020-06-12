@@ -46,7 +46,6 @@ function initMap() {
   addEvents()
 }
 
-
 // Funciones para crear todos los botones custom del mapa
 function obtainGpsControl(controlDiv, map) {
 
@@ -414,46 +413,37 @@ function showDetailEvent(customInfo){
    })
 }
 
-//Funcion que añade los eventos cercanos a la lista
-function showNearEvents(){
-
-  card = document.querySelector(".eventListTable");
-  for (var i = 0; i < nearEvents.length; i++) {
-    listNear = document.createElement('li');
-    listNear.id = "listEvents";
-    listNear.innerHTML = "<h1>"+nearEvents[i].name+"</h1><img src='static/img/futbol.jpg' alt='caca'><p>Tipo de evento:"+events[i].table+"</p>";
-    card.appendChild(listNear);
-  }
-}
-
 //Funcion que trae todos los eventos para mostrar
 async function showAllEvents(){
 
   card = document.querySelector(".eventListTable");
-
   for (var i = 0; i < groupMarkers.length; i++){
-    var id = groupMarkers.id;
-    var caca = groupMarkers[i];
+    var imgsrc = "";
 
     await fetch('http://127.0.0.1:8000/api/events/detail/'+groupMarkers[i].type+'/'+groupMarkers[i].id)
     .then( res => res.json())
     .then(events => {
       listAll = document.createElement('li');
       listAll.id = "listEvents";
+
+      if(events.image=="undefined") imgsrc = 'static/img/imgundefined.jpg';
+      else imgsrc = events.image;
+
       listAll.innerHTML = 
         `<h1 onclick="centerEventClick(${events.longitude}, ${events.latitude})">${events.name}</h1>
-        <img src='/media/workshops/2020/06/08/curso-online-pasteleria-reposteria_amp_primaria_1_1560502963.jpg' alt='caca'>
+        <h2 id="cordsFilter">${events.longitude},${events.latitude}</h2>
+        <img src='${imgsrc}' alt='caca'>
         <b><p>Comuna:</b> ${events.commune}</p>
         <b><p>Categoria de evento:</b>${events.type}</p>
         <b><p>Tipo de evento:</b>${groupMarkers[i].type}</p>
         <b><p>Descripcion:</b>  ${events.description}</p>
         <b><p>Inicio:</b>  ${events.start_date}, ${events.start_time}</p>
         <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p>`;
+        
       card.appendChild(listAll);  
     })    
   }
 }
-
 
 //Funcion que al clickear el titulo del evento lo centra en el mapa
 function centerEventClick(lng, lat){
@@ -491,7 +481,6 @@ function resetMarker(mark, i, eventCircle){
 }
 
 // Funcion que filtra los eventos en la lista por nombre
-
 function nameFilterEvent() {
   var input, filter, ul, li, a, i, txtValue;
   input = document.getElementById("filterInputName");
@@ -511,9 +500,7 @@ function nameFilterEvent() {
   }
 }
 
-
 // Funciones para filtar los eventos por tipo de evento
-
 function buttonFilterEvent(type) {
   
   var filter, ul, li, i, txtValue, txtValue1, txtValue2;
@@ -524,14 +511,16 @@ function buttonFilterEvent(type) {
   li = ul[0].getElementsByTagName("li");
 
     for (i = 0; i < li.length; i++) {
+      
       p = li[i].getElementsByTagName("p")[1];
-    
-
+      p2 = li[i].getElementsByTagName("p")[2];
+      
       txtValue = p.textContent.split(':')[1];
+      txtValue2 = p2.textContent.split(':')[1];
       txtValue1 = txtValue.split('-')[0];
-      // txtValue2 = txtValue.split('-')[1];
+      txtValue2 = txtValue2.split('-')[0];
 
-      if (txtValue1.toUpperCase().indexOf(filter) > -1)  {
+      if (txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1)  {
         li[i].style.display = "";
       } else {
         li[i].style.display = "none";
@@ -539,7 +528,26 @@ function buttonFilterEvent(type) {
       if (filter=="ALL"){
         li[i].style.display = "";
       }
-      if(nearEvents[1]==undefined & filter=="NEAR"){
+    }
+}
+
+//Funcion para filtrar los eventos cercanos en la lista
+function buttonFilterNearEvent(){
+  var ul = document.getElementsByClassName("eventListTable");
+  var filtro = ul[0].getElementsByTagName("h2");
+  var li = ul[0].getElementsByTagName("li");
+  var name = ul[0].getElementsByTagName("h1");
+  for (i = 0; i < li.length; i++){
+    var flag=0;
+    for (i2 = 0; i2 < nearEvents.length; i2++){
+      if(nearEvents[i2].latitude===filtro[i].textContent.split(',')[1] & nearEvents[i2].longitude===filtro[i].textContent.split(',')[0]){
+        li[i].style.display = "";
+        console.log(name[i]);
+        flag++;
       }
     }
+    if(flag==0){
+      li[i].style.display = "none";
+    }
+  }
 }
