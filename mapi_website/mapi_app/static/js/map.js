@@ -33,11 +33,11 @@ function initMap() {
 
 // Funcion que abre y cierra la tarjeta de evento al hacerle click
 function openPanel(customInfo){
-  document.getElementById("menuPanel").style.width="50%";
+  document.getElementById("menuPanel").style.width="100%";
   document.getElementById("map").style.width="50%";
   document.getElementById("map").style.marginLeft="50%";
   document.getElementById("map").style.transition= "all 1s";
-  showDetailEvent(customInfo, ".panelContent", 0, "detailevent")
+  showDetailEvent(customInfo, ".panelContent", 1, "detailEvent", "col-md-12")
 }
 function closePanel(){
   document.getElementById("menuPanel").style.width="0%";

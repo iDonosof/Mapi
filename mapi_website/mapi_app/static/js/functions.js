@@ -96,7 +96,7 @@ function addOneMark(event){
 // }
 
 //Funcion que muestra el detalle del evento solicitado
-function showDetailEvent(event, place, info, typeid){
+function showDetailEvent(event, place, info, typeid='', typeclass=''){
     detail = document.querySelector(place)
     var id = event.split(',')[0];
     var typeEvent = event.split(',')[1];
@@ -106,6 +106,7 @@ fetch('http://127.0.0.1:8000/api/events/detail/'+typeEvent+'/'+id)
 .then(events => {
     detailEvent = document.createElement("div");
     detailEvent.id = typeid;
+    detailEvent.className = typeclass;
     if(selection==0){
         detailEvent.innerHTML = 
         `<h1>${events.name}</h1>
@@ -119,7 +120,7 @@ fetch('http://127.0.0.1:8000/api/events/detail/'+typeEvent+'/'+id)
     if(selection==1){
         detailEvent.innerHTML = 
         `<h1>${events.name}</h1>
-        <img src='/media/workshops/2020/06/08/curso-online-pasteleria-reposteria_amp_primaria_1_1560502963.jpg' alt='caca'>
+        <img src='${events.image}' alt='${events.name}'>
         <b><p>Comuna:</b> ${events.commune}</p>
         <b><p>Tipo de evento:</b> ${typeEvent} - ${events.type}</p>
         <b><p>Descripcion:</b>  ${events.description}</p>

@@ -1,16 +1,19 @@
-//Background Principal de la pagina
 
+//Implementación de la fuente (font-family) de la pagina
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap');
+
+
+//Background Principal de la pagina
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Noto Sans SC', sans-serif;
 }
 
 
 html,body{
     background: linear-gradient(80deg,$color-background,$scolor-background);
-    font-family: sans-serif;
-    font-family: 'Montserrat', sans-serif;
     height: 100%;
 }
 
@@ -152,7 +155,6 @@ html,body{
 
 #controlText{
     color: rgb(25,25,25);
-    font-family: Roboto,Arial,sans-serif;
     font-size: 16px;
     line-height: 38px;
     padding-left: 5px;
@@ -234,6 +236,7 @@ html,body{
     top: 0px;
     right: 25px;
     font-size: 36px;
+    margin-bottom: 15px;
 }
 
 .rightPanel{
@@ -396,25 +399,29 @@ html,body{
 }
 
 #detailEvent{
-    text-align: center;
+    text-align: left;
 }
+
 #detailEvent h1{
-    font-size: 52px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-#detailEvent img{
-    width: 50%;
-    height: 50%;
-    margin-bottom: 10px;
-}
-#detailEvent p{
+    margin-top: 7%;
+    margin-bottom: 2%;
     font-size: 24px;
-    margin-bottom: 5px;
+}
+
+#detailEvent img{
+    width: 100%;
+    display: block;
+    margin: auto;
+}
+
+#detailEvent p{
+    font-size: 22px;
+    margin-top: 8px ;
+    margin-bottom: 8px;
 }
 #detailEvent #starsImg{
-    width: 100px;
-    height: 20px;
+    width: 35vw;
+    height: 10vh;
     margin: 0;
 }
 
@@ -453,6 +460,7 @@ html,body{
     text-decoration: none;
     display: block;
 }
+
 .show {display: block;}
 #cordsFilter{
     display: none;
