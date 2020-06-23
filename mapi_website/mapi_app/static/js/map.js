@@ -30,150 +30,131 @@ function initMap() {
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchControlDiv);
 }
 
+// Funcion que calcula la ruta entre mi posicion del gps y la del evento, luego hace visible el boton de ruta para abrir google maps con la ruta creada
+// function calcRoute(i) {  
+//     var start = userPosition;
+//     var end = events[i].LatLng[0];
+//     var request = {
+//       origin: start,
+//       destination: end,
+//       travelMode: "DRIVING"
+//     };
+//     if(userPosition !== undefined){
+//       htmlGoogle = `https://www.google.com/maps/dir/?api=1&origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}`;
 
-// Funcion que abre y cierra la tarjeta de evento al hacerle click
-function openPanel(customInfo){
-  document.getElementById("menuPanel").style.width="50%";
-  document.getElementById("map").style.width="50%";
-  document.getElementById("map").style.marginLeft="50%";
-  document.getElementById("map").style.transition= "all 1s";
-  showDetailEvent(customInfo, ".panelContent", 0, "detailevent")
+//       document.querySelector("#controlText").style.visibility="visible";
+//       document.querySelector("#controlUI").style.visibility="visible";
+
+//       directionsService.route(request, function(result, status) {
+//         if (status == "OK") {
+//           directionsRenderer.setDirections(result);
+//         }
+//       });
+//     } else{
+//       alert("No tenemos acceso a tu ubicacion aun, revisa que hayas dado permiso al GPS para usar esta funcion")
+//     }
+// }
+
+// Funcion que dibuja un circulo en el mapa 
+function drawCircle(position, radius, color="Blue"){
+  eventCircle = new google.maps.Circle({
+      strokeColor: color,
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: color,
+      fillOpacity: 0.35,
+      map: map,
+      center: position,
+      radius: radius
+  });  
 }
-function closePanel(){
-  document.getElementById("menuPanel").style.width="0%";
-  document.getElementById("map").style.width="100%";
-  document.getElementById("map").style.marginLeft="0";
-  document.getElementById("map").style.transition= "all 1s";
-  setTimeout(function(){
-    detailContent = document.querySelector(".panelContent");
-    detail = detailContent.querySelector("#detailEvent");
-    detailContent.removeChild(detail);
-  }, 1000); 
+
+// Funcion que añade todos los eventos que se les da al mapa
+function addVariousMarks(events){
+  for (var i = 0; i < events.length; i++) {       
+  LatLng = [{lat: parseFloat(events[i].latitude), lng: parseFloat(events[i].longitude)}]
+  markerEvents = new google.maps.Marker({
+      id: events[i].id,
+      position: LatLng[0],
+      title: events[i].name,
+      map: map,
+      type: events[i].table
+  });
+  markerEvents.customInfo = events[i].id+","+events[i].table +","+ events[i].latitude+","+ events[i].longitude;
+  google.maps.event.addListener(markerEvents, 'click', function () {
+      openPanel(this.customInfo);
+  });
+      allEventsMarkers.push(markerEvents)
+  }
+  var markerCluster = new MarkerClusterer(map, allEventsMarkers,
+      {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
-// Funcion que abre y cierra la lista de eventos cercanos o todos al hacerle click
-function openPanelR(){
-  var detailContent = document.querySelector(".panelContent");
-  var detail = detailContent.querySelector("#detailEvent");
-  document.getElementById("menuPanel").style.width="0%";
-  document.getElementById("map").style.width="100%";
-  document.getElementById("map").style.marginLeft="0";
-  document.getElementById("menuPanelR").style.width="100%";
-  showAllEvents(allEventsDetail, ".eventListTable", "listEvents");
-}
-
-function closePanelR(){
-  document.getElementById("menuPanelR").style.width="0%";
-  setTimeout(function(){
-    card = document.querySelector(".eventListTable");
-    card.querySelectorAll('*').forEach(n => n.remove());
-  }, 1000); 
-
+// Funcion que añade 1 marcador al mapa
+function addOneMark(event){      
+  LatLng = [{lat: parseFloat(event.latitude), lng: parseFloat(event.longitude)}]
+  markerEvents = new google.maps.Marker({
+      id: event.id,
+      position: LatLng[0],
+      title: event.name,
+      map: map,
+      type: event.table
+  });
 }
 
 //Funcion que al clickear el titulo del evento lo centra en el mapa
-function centerEventClick(lng, lat){
+function centerEventClick(i){
   closePanelR()
-  LatLng = [{lat: parseFloat(lat), lng: parseFloat(lng)}]
-  latE = lat;
-  lngE = lng;
-
+  LatLng = [{lat: parseFloat(eventsList[i].latitude), lng: parseFloat(eventsList[i].longitude)}]
   map.setCenter(LatLng[0]);
   map.setZoom(18);
-
-  for (i = 0; i < groupMarkers.length; i++){
-    
-    if(latE===parseFloat(groupMarkers[i].customInfo.split(',')[2]) & lngE===parseFloat(groupMarkers[i].customInfo.split(',')[3]) ){
-      groupMarkers[i].setAnimation(google.maps.Animation.BOUNCE);
-      eventCircle = new google.maps.Circle({
-        strokeWeight: 0,
-        fillColor: 'red',
-        fillOpacity: 0.35,
-        map: map,
-        center: {lat: parseFloat(groupMarkers[i].customInfo.split(',')[2]), lng: parseFloat(groupMarkers[i].customInfo.split(',')[3])},
-        radius: 40
-      });  
-      resetMarker(groupMarkers, i, eventCircle)
-    }
-  }
+  allEventsMarkers[i].setAnimation(google.maps.Animation.BOUNCE);
+  drawCircle(LatLng[0], 100, "Blue");
+  resetMarker(i);
 }
 
 //Funcion que quita la animacion y circulo en 4 segundos
-function resetMarker(mark, i, eventCircle){
+function resetMarker(i){
   setTimeout(() => {      
-    eventCircle.setMap(null);
-    mark[i].setAnimation(null); 
+      eventCircle.setMap(null);
+      allEventsMarkers[i].setAnimation(null); 
   }, 4000);
 }
 
-// Funcion que filtra los eventos en la lista por nombre
-function nameFilterEvent() {
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById("filterInputName");
-  filter = input.value.toUpperCase();
+function setMyPosition(position)
+  {
+    userPosition = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
 
-  ul = document.getElementsByClassName("eventListTable");
-  li = ul[0].getElementsByTagName("li");
-  
-  for (i = 0; i < li.length; i++) {
-      a = li[i].getElementsByTagName("h1")[0];
-      txtValue = a.textContent || a.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
-      }
+    var markerGps = new google.maps.Marker({
+      position: userPosition,
+      title:"Mi posicion"
+    });
+
+    markerGps.setMap(map);
+    map.setCenter(userPosition);
+    map.setZoom(14);
+    drawCircle(userPosition, 1500, "cyan")
   }
-}
 
-// Funciones para filtar los eventos por tipo de evento
-function buttonFilterEvent(type) {
-  
-  var filter, ul, li, i, txtValue, txtValue1, txtValue2;
-  filter = type.toUpperCase();
-  input = document.getElementById("filterInputName");
-  input.value = '';
-  ul = document.getElementsByClassName("eventListTable");
-  li = ul[0].getElementsByTagName("li");
-
-    for (i = 0; i < li.length; i++) {
-      
-      p = li[i].getElementsByTagName("p")[1];
-      p2 = li[i].getElementsByTagName("p")[2];
-      
-      txtValue = p.textContent.split(':')[1];
-      txtValue2 = p2.textContent.split(':')[1];
-      txtValue1 = txtValue.split('-')[0];
-      txtValue2 = txtValue2.split('-')[0];
-
-      if (txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1)  {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
-      }
-      if (filter=="ALL"){
-        li[i].style.display = "";
-      }
+// Funcion que muestra los errores del gps
+function showError(error){
+  var mes = "";
+  switch(error.code) 
+    {
+    case error.POSITION_UNAVAILABLE:
+      mes="La posicion esta inhabilitada";
+      alert(mes)
+      break;
+    case error.TIMEOUT:
+      mes="Se ha sobrepasado el tiempo limite de espera para el GPS";
+      alert(mes)
+      break;
+    case error.UNKNOWN_ERROR:
+      mes="Error de GPS desconocido";
+      alert(mes)
+      break;
     }
-}
-
-//Funcion para filtrar los eventos cercanos en la lista
-function buttonFilterNearEvent(){
-  var ul = document.getElementsByClassName("eventListTable");
-  var filtro = ul[0].getElementsByTagName("h2");
-  var li = ul[0].getElementsByTagName("li");
-  var name = ul[0].getElementsByTagName("h1");
-  for (i = 0; i < li.length; i++){
-    var flag=0;
-    for (i2 = 0; i2 < nearEvents.length; i2++){
-      if(nearEvents[i2].latitude===filtro[i].textContent.split(',')[1] & nearEvents[i2].longitude===filtro[i].textContent.split(',')[0]){
-        li[i].style.display = "";
-        console.log(name[i]);
-        flag++;
-      }
-    }
-    if(flag==0){
-      li[i].style.display = "none";
-    }
-  }
 }

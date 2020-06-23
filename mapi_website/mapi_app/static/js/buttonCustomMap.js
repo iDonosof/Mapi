@@ -12,8 +12,8 @@ function obtainGpsControl(controlDiv, map) {
     obtainGpsControl.appendChild(obtainGpsText);
     obtainGpsControl.addEventListener('click', function() {
   
-      if(miubicacion !== undefined){
-        map.setCenter(miubicacion);
+      if(userPosition !== undefined){
+        map.setCenter(userPosition);
         map.setZoom(14);
       }else
         alert("Por favor activa el gps o acepta el permiso para acceder a esta funcionalidad")
@@ -99,6 +99,10 @@ function obtainGpsControl(controlDiv, map) {
       alert("Por favor danos los permisos de ubicacion para poder mostrarte los eventos cerca de tu ubicacion y poder encontrarlos mas facil")
       if (navigator.geolocation ){
         navigator.geolocation.getCurrentPosition(setMyPosition,showError);
+        setTimeout(() => {      
+          calcNearEvents(eventsList, userPosition, 3)
+        }, 2000);
+        
       }
       else{
         alert("Dispositivo incompatible con la funcion de GPS")
