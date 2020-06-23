@@ -7,19 +7,37 @@ var chileBounds = {
   east: -65 ,
 };
 
-var mark = {"id": 1, "name": "Vacunacion de mascotas", "latitude": "-33.4949035", "longitude": "-70.7572481", "table": "Evento", "icon": null};
+let searcherAbortController = new AbortController();
 
 // Carga y guarda los datos de posicionamiento de todos los eventos en allEventsMarkers
 fetch('http://127.0.0.1:8000/api/events/marks-list')
 .then( res => res.json())
 .then(events => {
-    eventsList = events;
-}) 
+  eventsList = events;
+});
 
 //Carta todos los detalles del evento para listar
 fetch('http://127.0.0.1:8000/api/events/list')
 .then( res => res.json())
 .then(events => {  
-      allEventsDetail = events;
-}) 
+  allEventsDetail = events;
+});
 
+//Todo lo que este dentro del onload sera realizado cuando este cargada la pagina
+window.onload = function() {
+  initMap();
+}
+
+function SearcherFetch(text) {
+  return fetch('/api/search', {
+    method: 'POST',
+    headers: new Headers({
+      'X-CSRFToken': GetCookie('csrftoken'),
+      'Content-Type': 'application/json;charset=UTF-8'
+    }),
+    body: JSON.stringify({ words: text }),
+    signal: searcherAbortController.signal
+  })
+  .then(response => response.ok ? response.json() : false)
+  .catch(err => err.name !== 'AbortError' ? console.log(err) : false);
+}

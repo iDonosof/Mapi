@@ -15,19 +15,20 @@ function initMap() {
   map.mapTypes.set('styleMap', new google.maps.StyledMapType(styleMap, { name: 'Mapi Map' }));
 
   var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map);
+  CenterControl(centerControlDiv, map);
   map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(centerControlDiv);
 
   var openEventsDiv = document.createElement('div');
-  var opendiv = new openEventsControl(openEventsDiv, map);
+  openEventsControl(openEventsDiv, map);
   map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(openEventsDiv);
 
   var searchControlDiv = document.createElement('div');
-  var mapdiv = new mapTypeControl(searchControlDiv, map);
+  mapTypeControl(searchControlDiv, map);
   searchControlDiv.id = 'searchBarControl';
-  searchControlDiv.className = 'col-sm-8';
-  var srcControl = searchBarControl(searchControlDiv, map);
+  searchControlDiv.className = 'col-sm-8 autocomplete';
+  searchBarControl(searchControlDiv, map);
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchControlDiv);
+
 }
 
 

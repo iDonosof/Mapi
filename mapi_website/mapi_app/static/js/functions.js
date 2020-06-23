@@ -160,3 +160,43 @@ function showAllEvents(event, place, typeid){
         card.appendChild(listAll);
     }
 }
+
+function GetCookiesAsObject(){
+    let cookies = {};
+    document.cookie
+    .split(';')
+    .forEach(cookie => cookies = {
+        ...cookies, 
+        [cookie.split('=')[0].trim()]: cookie.split('=')[1].trim()
+    });
+    return cookies;
+}
+
+function SetCookie(name, value, expire = new Date().toUTCString()) {
+    if(typeof name !== 'string' || name === '' || !name || !value)
+        throw 'El nombre o valor no tienen el formato adecuado';
+    if(typeof expire === 'number') {
+        const date = new Date();
+        date.setTime(date.getTime() + (expire * 24 * 60 * 60 * 1000));
+        expire = date.toUTCString();
+    }
+    else if (typeof expire === 'object') {
+        expire = expire.toUTCString();
+    }
+    document.cookie = `${name}=${value.toString()}; expires=${expire}; path=/;`;
+}
+
+function ExistsCookie(name) {
+    return document.cookie.split(';').find(cookie => cookie.split('=')[0].trim() === name) ? true : false;
+}
+
+function GetCookie(name) {
+    const cookie = document.cookie.split(';').find(cookie => cookie.split('=')[0].trim() === name);
+    return cookie ? cookie.split('=')[1].trim() : undefined
+    
+}
+
+function DeleteCookie(name){
+    if(name !== '' || name !== undefined || name !== null)
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
