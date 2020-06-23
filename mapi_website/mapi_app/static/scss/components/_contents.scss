@@ -399,13 +399,24 @@ html,body{
 }
 
 #detailEvent{
-    text-align: left;
+    text-align: justify;
 }
 
 #detailEvent h1{
     margin-top: 7%;
-    margin-bottom: 2%;
-    font-size: 24px;
+    font-size: 2.5rem;
+    margin-bottom: 10%;
+    text-align: center;
+    line-height: 2.3rem;
+}
+
+#detailEvent h2{
+    text-align: center;
+    font-size: 2rem;
+}
+
+#detailEvent p{
+    padding-bottom: 1rem;
 }
 
 #detailEvent img{
@@ -420,8 +431,7 @@ html,body{
     margin-bottom: 8px;
 }
 #detailEvent #starsImg{
-    width: 35vw;
-    height: 10vh;
+    width: 100%;
     margin: 0;
 }
 
