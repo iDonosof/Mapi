@@ -78,6 +78,7 @@ function addVariousMarks(events){
       position: LatLng[0],
       title: events[i].name,
       map: map,
+      icon: events[i].icon,
       type: events[i].table
   });
   markerEvents.customInfo = events[i].id+","+events[i].table +","+ events[i].latitude+","+ events[i].longitude;
