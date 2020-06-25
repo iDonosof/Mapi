@@ -81,3 +81,4 @@ function closePanelR(){
     card.querySelectorAll('*').forEach(n => n.remove());
   }, 1000); 
 }
+addVariousMarks(eventsList)

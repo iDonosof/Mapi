@@ -127,7 +127,8 @@ function obtainGpsControl(controlDiv, map) {
     });
     controlDiv.appendChild(autocompleteItems);
     document.addEventListener('click', function() { 
-      if(document.querySelector('.autocomplete-items'))document.querySelector('.autocomplete-items').remove() }, false);
+      if(document.querySelector('.autocomplete-items'))document.querySelector('.autocomplete-items').remove() 
+    }, false);
 }
   
 function CenterControl(controlDiv, map) {

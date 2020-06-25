@@ -28,7 +28,26 @@ function initMap() {
   searchControlDiv.className = 'col-sm-8 autocomplete';
   searchBarControl(searchControlDiv, map);
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchControlDiv);
+}
 
+// Funcion que abre y cierra la tarjeta de evento al hacerle click
+function openPanel(customInfo){
+  document.getElementById("menuPanel").style.width="100%";
+  document.getElementById("map").style.width="50%";
+  document.getElementById("map").style.marginLeft="50%";
+  document.getElementById("map").style.transition= "all 1s";
+  showDetailEvent(customInfo, ".panelContent", 1, "detailEvent", "col-md-12")
+}
+function closePanel(){
+  document.getElementById("menuPanel").style.width="0%";
+  document.getElementById("map").style.width="100%";
+  document.getElementById("map").style.marginLeft="0";
+  document.getElementById("map").style.transition= "all 1s";
+  setTimeout(function(){
+    detailContent = document.querySelector(".panelContent");
+    detail = detailContent.querySelector("#detailEvent");
+    detailContent.removeChild(detail);
+  }, 1000); 
 }
 
 // Funcion que calcula la ruta entre mi posicion del gps y la del evento, luego hace visible el boton de ruta para abrir google maps con la ruta creada
@@ -123,7 +142,7 @@ function resetMarker(i){
 }
 
 function setMyPosition(position)
-  {
+{
     userPosition = {
       lat: position.coords.latitude,
       lng: position.coords.longitude
@@ -138,13 +157,12 @@ function setMyPosition(position)
     map.setCenter(userPosition);
     map.setZoom(14);
     drawCircle(userPosition, 1500, "cyan")
-  }
+}
 
 // Funcion que muestra los errores del gps
-function showError(error){
+function showError(error) {
   var mes = "";
-  switch(error.code) 
-    {
+  switch(error.code) {
     case error.POSITION_UNAVAILABLE:
       mes="La posicion esta inhabilitada";
       alert(mes)
@@ -157,5 +175,5 @@ function showError(error){
       mes="Error de GPS desconocido";
       alert(mes)
       break;
-    }
+  }
 }

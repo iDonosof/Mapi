@@ -24,7 +24,7 @@ function calcNearEvents(events, userPosition, range){
 }
 
 //Funcion que muestra el detalle del evento solicitado
-function showDetailEvent(event, place, info, typeid){
+function showDetailEvent(event, place, info, typeid='', typeclass=''){
     detail = document.querySelector(place)
     var id = event.split(',')[0];
     var typeEvent = event.split(',')[1];
@@ -34,6 +34,7 @@ fetch('http://127.0.0.1:8000/api/events/detail/'+typeEvent+'/'+id)
 .then(events => {
     detailEvent = document.createElement("div");
     detailEvent.id = typeid;
+    detailEvent.className = typeclass;
     if(selection==0){
         detailEvent.innerHTML = 
         `<h1>${events.name}</h1>
@@ -43,26 +44,22 @@ fetch('http://127.0.0.1:8000/api/events/detail/'+typeEvent+'/'+id)
         <b><p>Direccion:</b>  ${events.address}</p>
         <b><p>Inicio:</b>  ${events.start_date}, ${events.start_time}</p>
         <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p>`;
-        }
+    }
     if(selection==1){
         if(events.image==undefined) imgsrc = "static/img/imgundefined.jpg";
         else imgsrc = events.image;
         detailEvent.innerHTML = 
         `<h1>${events.name}</h1>
-        <img src='${imgsrc}' alt='caca'>
+        <img src='${events.image}' alt='${events.name}'>
+        <h1>${events.name}</h1>
         <b><p>Comuna:</b> ${events.commune}</p>
-        <b><p>Tipo de evento:</b> ${typeEvent} - ${events.type}</p>
+        <b><p>Tipo de evento:</b> ${typeEvent}-${events.type}</p>
         <b><p>Descripcion:</b>  ${events.description}</p>
         <b><p>Direccion:</b>  ${events.address}</p>
         <b><p>Inicio:</b>  ${events.start_date}, ${events.start_time}</p>
-        <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p>
-        <b><p>Puntuaciones:</b></p>
-        <p><img id="starsImg" src="static/img/5stars.png" alt="5 estrellas imagen"> = <b>${events.five_stars}</b></p>
-        <p><img id="starsImg" src="static/img/4stars.png" alt="4 estrellas imagen"> = <b>${events.four_stars}</b></p>
-        <p><img id="starsImg" src="static/img/3stars.png" alt="3 estrellas imagen"> = <b>${events.three_stars}</b></p>
-        <p><img id="starsImg" src="static/img/2stars.png" alt="2 estrellas imagen"> = <b>${events.two_stars}</b></p>
-        <p><img id="starsImg" src="static/img/1stars.png" alt="1 estrellas imagen"> = <b>${events.one_stars}</b></p>
-        <h1>Comentarios de la gente</h1>
+        <b><p>Termino:</b>  ${events.ended_date}, ${events.ended_time}</p> <br>
+        <hr>
+        <h2>Comentarios de la gente</h2>
         <p>${events.comments}</p>`;
         }
       detail.appendChild(detailEvent);
